@@ -6,3 +6,4 @@ staticfiles/
 .env
 venv/
 .venv/
+db.sqlite3
