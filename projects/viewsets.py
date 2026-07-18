@@ -1,12 +1,14 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, MultiPartParser,JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from solarblocks import authentication
 
-from .models import JobParameter, Project
+from .models import JobParameter, Project, JobParameterKey
+
+
 from .serializers import (
     JobParameterSerializer,
     ProjectDetailSerializer,
@@ -63,12 +65,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=['get', 'patch'],
         url_path=r'parameters/(?P<key>[^/.]+)',
-        parser_classes=[MultiPartParser, FormParser],
+        parser_classes=[MultiPartParser, FormParser,JSONParser],
     )
     def parameter(self, request, pk=None, key=None):
         project = self.get_object()
-        if key not in JobParameter.Key.values:
-            return Response({'detail': 'Invalid parameter key.'}, status=status.HTTP_400_BAD_REQUEST)
+        if key not in JobParameterKey.values:
+            return Response(
+                {"detail": "Invalid parameter key."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         obj, _ = JobParameter.objects.get_or_create(project=project, key=key)
 
